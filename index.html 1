@@ -80,6 +80,17 @@ hr{border:none;border-top:1px solid var(--bdr);margin:16px 0}
 .row{display:flex;align-items:center;gap:8px}.spacer{flex:1}
 .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mt8{margin-top:8px}.mt12{margin-top:12px}
 </style>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-EDFY21NXK2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-EDFY21NXK2');
+    function trackEvent(action, params){
+      if(typeof gtag !== 'undefined') gtag('event', action, params||{});
+    }
+  </script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -803,7 +814,7 @@ function valPorPessoa(mod,total,taxa,nParts,nHosts){return function(p){if(mod===
 function buscarPrecoCat(nome){var nl=nome.toLowerCase();var m=CAT.find(function(p){return(p.n+" "+p.b).toLowerCase()===nl||nl.indexOf(p.n.toLowerCase())>-1||p.n.toLowerCase().indexOf(nl)>-1;});return m?m.p:null;}
 function waLink(phone,msg){var p=(phone||"").replace(/[^0-9]/g,"");return p?"https://wa.me/55"+p+"?text="+encodeURIComponent(msg):null;}
 
-if(SES)loadHome();
+if(SES){loadHome();trackEvent("sessao_retomada");}
 // detecta codigo na URL (?codigo=XXXX) e abre sheet de cadastro
 (function(){
   var params=new URLSearchParams(window.location.search);
@@ -833,7 +844,7 @@ function doLogin(){
   if(!validarTelBR(phone)){T("Telefone invalido. Use DDD + numero (ex: 11 99999-9999)","ter");return;}
   if(!pix){T("Preencha sua chave Pix","ter");return;}
   SES={uid:SES?SES.uid:gid(),name:name,phone:phone,pix:pix};
-  DB.set("ses",SES);loadHome();
+  DB.set("ses",SES);trackEvent("conta_criada");loadHome();
 }
 function logout(){SES=null;DB.del("ses");go("s-splash");}
 function loadHome(){if(!SES){go("s-splash");return;}go("s-home");Q("hname").textContent=SES.name.split(" ")[0];Q("hav").textContent=ini(SES.name);renderHome();}
@@ -908,7 +919,7 @@ function novoEvento(){
   var ev={id:id,nome:nome,data:data,local:local,emoji:emoji,hostId:SES.uid,hostNome:SES.name,hostPix:SES.pix||"",status:"aberto",modeloPagamento:"equal",criadoEm:agora(),participantes:{},itens:{}};
   ev.participantes[SES.uid]={nome:SES.name,telefone:SES.phone||"",pix:SES.pix||"",role:"host",pago:false,entrou:agora()};
   salvarEvento(ev);Q("evname").value="";Q("evdate").value="";Q("evloc").value="";
-  T("Evento criado!","tok");abrirHost(id);
+  T("Evento criado!","tok");trackEvent("evento_criado");abrirHost(id);
 }
 
 function abrirHost(id){var ev=getEvento(id);if(!ev){T("Evento nao encontrado","ter");return;}CID=id;go("s-host");swTab("i");renderHost(ev);}
@@ -1195,7 +1206,7 @@ function fecharLista(){
     var link=waLink(p.telefone,msg);if(link)window.open(link,"_blank");
     if(pendentes.length>1)setTimeout(function(){T("Envie tambem para os outros "+(pendentes.length-1)+" convidados","tin");},1500);
   }
-  T("Lista fechada!","tok");renderHost(ev);swTab("m");
+  T("Lista fechada!","tok");trackEvent("lista_fechada");renderHost(ev);swTab("m");
 }
 
 function renderPedido(ev){
@@ -1221,7 +1232,7 @@ function salvarPedido(){
   ev.pedido.fornecedor=Q("ofornecedor")?Q("ofornecedor").value:"ifood";
   ev.pedido.timing=Q("otiming")?Q("otiming").value:"day-of";
   ev.pedido.notas=Q("onotes")?Q("onotes").value.trim():"";
-  ev.pedido.salvoEm=agora();salvarEvento(ev);T("Pedido registrado!","tok");mostrarStep(2);
+  ev.pedido.salvoEm=agora();salvarEvento(ev);trackEvent("pedido_salvo");T("Pedido registrado!","tok");mostrarStep(2);
 }
 
 function montarMsgAcerto(ev,item){
@@ -1285,6 +1296,7 @@ function confirmarValorReal(){
   // dispara WhatsApp para todos com diferença automaticamente
   dispararAcertosWA(ev);
   T("Valor confirmado! Mensagens enviadas para os convidados.","tok");
+  trackEvent("valor_real_confirmado");
   mostrarStep(3);renderAcerto(ev);renderPag(ev);
 }
 
@@ -1602,7 +1614,7 @@ function entrarComCodigo(){
   if(Q("gcname"))Q("gcname").value="";
   if(Q("gcphone"))Q("gcphone").value="";
   if(Q("gcpix"))Q("gcpix").value="";
-  fecharSheets();abrirGuest(ev.id,evGid);
+  fecharSheets();trackEvent("convidado_entrou");abrirGuest(ev.id,evGid);
 }
 
 function abrirGuest(evid,evGid){
@@ -2393,7 +2405,7 @@ function encerrarPedido(){
     ev.pedido._pendentesNotif=comTel.slice(1).map(function(e){return {uid:e[0],phone:e[1].telefone,nome:e[1].nome};});
     salvarEvento(ev);
   }
-  T("Evento iniciado!","tok");
+  T("Evento iniciado!","tok");trackEvent("evento_iniciado");
   mostrarStep(4);
   renderStep4(ev);
 }
@@ -2537,7 +2549,7 @@ function encerrarEvento(){
         var phone=p.telefone.replace(/[^0-9]/g,"");
         window.open("https://api.whatsapp.com/send?phone=55"+phone+"&text="+encodeURIComponent(msg),"_blank");
       }
-      T("Evento encerrado!","tok");
+      T("Evento encerrado!","tok");trackEvent("evento_encerrado");
       renderEncerramento(ev,true,null);
     }
   );
@@ -2679,8 +2691,7 @@ function confirmarPagamentoGuest(evid,evGid){
   ev.participantes[evGid].avisouPagamento=true;
   ev.participantes[evGid].avisouEm=agora();
   salvarEvento(ev);
-  T("Aviso enviado ao host!","tok");
-  // re-renderiza para mostrar estado atualizado
+  T("Aviso enviado ao host!","tok");trackEvent("convidado_avisou_pagamento");
   renderGuest(ev,evGid);
 }
 
