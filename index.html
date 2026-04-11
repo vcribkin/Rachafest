@@ -104,12 +104,11 @@ hr{border:none;border-top:1px solid var(--bdr);margin:16px 0}
     <div style="font-size:15px;color:var(--mu);text-align:center;line-height:1.6;max-width:280px;margin-bottom:40px">Organize qualquer evento com amigos.<br>Sem confusao, sem grupo de WhatsApp.</div>
   </div>
   <div style="padding:0 18px 48px">
-    <button class="btn" onclick="goLogin('host')" style="background:#fff;color:#1a1a1a;font-weight:600;gap:10px;display:flex;align-items:center;justify-content:center">
+    <button class="btn" onclick="loginGoogle()" style="background:#fff;color:#1a1a1a;font-weight:600;gap:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
       <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-      Entrar com Google para criar
+      Entrar com Google
     </button>
-    <button class="btn bs" onclick="abrirCodigo()">Participar de um evento</button>
-    <p style="font-size:12px;color:var(--mu);text-align:center;margin-top:4px">Hosts entram com Google. Convidados usam o codigo do evento.</p>
+    <p style="font-size:12px;color:var(--mu);text-align:center">Hosts e convidados entram com Google. Sessao permanente em qualquer dispositivo.</p>
   </div>
 </div>
 
@@ -122,13 +121,18 @@ hr{border:none;border-top:1px solid var(--bdr);margin:16px 0}
     <div style="width:50px"></div>
   </div>
   <div class="body">
-    <div class="ptitle" id="ltitle">Criar conta</div>
-    <div class="psub">Nome, telefone e chave Pix — tudo obrigatorio</div>
+    <div class="ptitle" id="ltitle">Complete seu cadastro</div>
+    <div class="psub" id="lsub">Preencha os dados abaixo para continuar</div>
     <input type="hidden" id="lrole" value="host">
     <div class="ig"><label class="il">Seu nome *</label><input class="inp" id="ln" placeholder="Ex: Vitor Souza"></div>
     <div class="ig"><label class="il">Telefone (DDD + numero) *</label><input class="inp" id="lp" placeholder="(11) 99999-9999" type="tel"></div>
     <div class="ig"><label class="il">Chave Pix *</label><input class="inp" id="lpix" placeholder="CPF, telefone, email ou chave aleatoria"></div>
-    <div class="alr alb" style="font-size:12px;margin-bottom:12px">A chave Pix sera usada para que os convidados possam te pagar diretamente.</div>
+    <div class="alr alb" style="font-size:12px;margin-bottom:12px">A chave Pix e necessaria para pagamentos e reembolsos no evento.</div>
+    <div class="ig" id="codigo-wrap" style="display:none">
+      <label class="il">Codigo do evento (opcional)</label>
+      <input class="inp" id="lcodigo" placeholder="Ex: MN0L19FR" style="text-transform:uppercase;letter-spacing:2px;font-family:var(--mo);font-size:18px" oninput="this.value=this.value.toUpperCase()">
+      <div style="font-size:11px;color:var(--mu);margin-top:4px">Se voce foi convidado, cole o codigo aqui para entrar direto no evento.</div>
+    </div>
     <button class="btn bp mt8" onclick="doLogin()">Entrar</button>
   </div>
 </div>
@@ -576,14 +580,10 @@ hr{border:none;border-top:1px solid var(--bdr);margin:16px 0}
 
 <div class="sheet" id="sh-code">
   <div class="shdl"></div>
-  <div class="shtl">Criar conta e entrar</div>
-  <div class="shsb">Todos os campos sao obrigatorios. A chave Pix e necessaria para reembolsos.</div>
+  <div class="shtl">Entrar em um evento</div>
+  <div class="shsb">Digite o codigo compartilhado pelo organizador.</div>
   <div class="ig"><label class="il">Codigo do evento *</label><input class="inp" id="codin" placeholder="MN0L19FR" style="text-transform:uppercase;letter-spacing:2px;font-family:var(--mo);font-size:18px" oninput="this.value=this.value.toUpperCase()"></div>
-  <div class="ig"><label class="il">Seu nome *</label><input class="inp" id="gcname" placeholder="Ex: Ana Lima"></div>
-  <div class="ig"><label class="il">Telefone *</label><input class="inp" id="gcphone" placeholder="(11) 99999-9999" type="tel"></div>
-  <div class="ig"><label class="il">Chave Pix *</label><input class="inp" id="gcpix" placeholder="CPF, telefone, email ou chave aleatoria"></div>
-  <div class="alr alb" style="font-size:12px;margin-bottom:12px">A chave Pix e usada para reembolso automatico caso voce tenha pago mais do que o valor real.</div>
-  <button class="btn bp" onclick="entrarComCodigo()">Entrar no evento</button>
+  <button class="btn bp" id="btn-entrar" onclick="entrarComCodigo()">Entrar no evento</button>
   <button class="btn bg_" onclick="fecharSheets()">Cancelar</button>
 </div>
 
@@ -794,12 +794,32 @@ function _initFirebase(){
     if(user){
       _db.ref("usuarios/"+user.uid).once("value",function(snap){
         if(snap.exists()){
-          SES=snap.val();loadHome();
+          SES=snap.val();
+          // restaura sessão de convidado se havia evento ativo
+          if(SES.guestEventId){
+            GEV=SES.guestEventId;
+            GSS={uid:SES.uid,nome:SES.name};
+            _ouvirEvento(GEV,function(ev){
+              window._evCache[ev.id]=ev;
+              if(GSS&&GEV===ev.id)renderGuest(ev,GSS.uid);
+            });
+            _db.ref("eventos/"+GEV).once("value",function(snap){
+              if(!snap.exists()){loadHome();return;}
+              var ev=snap.val();window._evCache[ev.id]=ev;
+              abrirGuest(GEV,SES.uid);
+            });
+          } else {
+            loadHome();
+          }
         } else {
+          // primeiro acesso — pede complemento
           SES={uid:user.uid,name:user.displayName||"",phone:"",pix:"",foto:user.photoURL||""};
           if(Q("ln"))Q("ln").value=SES.name;
+          // mostra campo de código para possíveis convidados
+          var cw=Q("codigo-wrap");if(cw)cw.style.display="block";
           Q("lrole").value="host";
           Q("ltitle").textContent="Complete seu cadastro";
+          if(Q("lsub"))Q("lsub").textContent="Se voce for convidado, preencha o codigo do evento abaixo.";
           go("s-login");
         }
       });
@@ -885,9 +905,7 @@ function waLink(phone,msg){var p=(phone||"").replace(/[^0-9]/g,"");return p?"htt
 // sessao gerenciada pelo Firebase onAuthStateChanged
 // deteccao de codigo na URL feita pelo _initFirebase
 
-function goLogin(role){
-  Q("lrole").value=role;
-  Q("ltitle").textContent=role==="host"?"Criar conta para organizar":"Entrar para participar";
+function loginGoogle(){
   _whenReady(function(){
     var provider=new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({prompt:"select_account"});
@@ -896,6 +914,8 @@ function goLogin(role){
     });
   });
 }
+// mantido para compatibilidade com chamadas antigas
+function goLogin(role){ loginGoogle(); }
 function validarTelBR(tel){
   var d=tel.replace(/[^0-9]/g,"");
   return d.length===10||d.length===11;
@@ -904,6 +924,7 @@ function doLogin(){
   var name=Q("ln").value.trim();
   var phone=Q("lp").value.trim();
   var pix=Q("lpix")?Q("lpix").value.trim():"";
+  var codigo=Q("lcodigo")?Q("lcodigo").value.trim().toUpperCase():"";
   if(!name){T("Preencha seu nome","ter");return;}
   if(!phone){T("Preencha seu telefone","ter");return;}
   if(!validarTelBR(phone)){T("Telefone invalido. Use DDD + numero (ex: 11 99999-9999)","ter");return;}
@@ -913,7 +934,13 @@ function doLogin(){
   _whenReady(function(){
     _db.ref("usuarios/"+uid).set(SES,function(err){
       if(err){T("Erro ao salvar perfil","ter");return;}
-      trackEvent("conta_criada");loadHome();
+      trackEvent("conta_criada");
+      // se veio com código de evento, entra direto
+      if(codigo){
+        _entrarNoEventoPorCodigo(codigo,uid);
+      } else {
+        loadHome();
+      }
     });
   });
 }
@@ -1665,56 +1692,66 @@ function processarNota(input){
   reader.readAsDataURL(file);input.value="";
 }
 
-function abrirCodigo(){if(Q("codin"))Q("codin").value="";if(Q("gcname"))Q("gcname").value="";if(Q("gcphone"))Q("gcphone").value="";abrirSheet("sh-code");}
+function abrirCodigo(){
+  if(!SES){
+    // precisa logar antes
+    loginGoogle();
+    return;
+  }
+  if(Q("codin"))Q("codin").value="";
+  abrirSheet("sh-code");
+}
 function entrarComCodigo(){
+  if(!SES){T("Faca login primeiro","ter");return;}
   var code=Q("codin").value.trim().toUpperCase();
-  var nome=Q("gcname").value.trim();
-  var phone=Q("gcphone").value.trim();
-  var pix=Q("gcpix")?Q("gcpix").value.trim():"";
   if(!code){T("Digite o codigo do evento","ter");return;}
-  if(!nome){T("Digite seu nome","ter");return;}
-  if(!phone){T("Digite seu telefone","ter");return;}
-  if(!validarTelBR(phone)){T("Telefone invalido. Use DDD + numero (ex: 11 99999-9999)","ter");return;}
-  if(!pix){T("Digite sua chave Pix para receber reembolsos","ter");return;}
   var btn=Q("btn-entrar");if(btn)btn.textContent="Buscando...";
+  _entrarNoEventoPorCodigo(code,SES.uid,function(){if(btn)btn.textContent="Entrar no evento";});
+}
+
+function _entrarNoEventoPorCodigo(code,uid,onErro){
   _whenReady(function(){
     _db.ref("eventos").once("value",function(snap){
       var all=snap.val()||{};
-      if(btn)btn.textContent="Entrar no evento";
       var ev=Object.values(all).find(function(e){return e.id.toUpperCase().slice(0,8)===code;});
       if(!ev){
         T("Codigo nao encontrado. Verifique com o organizador.","ter");
         var inp=Q("codin");if(inp){inp.style.borderColor="var(--rd)";setTimeout(function(){inp.style.borderColor="";},2000);}
+        if(onErro)onErro();
         return;
       }
+      // se é o host do evento, abre como host
+      if(ev.hostId===uid){fecharSheets();openHostByCode(ev.id);return;}
       window._evCache[ev.id]=ev;
-      var partsE=Object.entries(ev.participantes||{});
-      var jaExiste=partsE.find(function(e){return e[1].telefone===phone&&e[1].role==="guest";});
-      var evGid;
+      // usa uid do Google — sessão permanente
+      var evGid=uid;
+      var jaExiste=ev.participantes&&ev.participantes[uid];
       if(jaExiste){
-        evGid=jaExiste[0];
-        SES={uid:evGid,name:nome,phone:phone,pix:pix};
-        ev.participantes[evGid].pix=pix;
-        T("Bem-vindo de volta, "+nome+"!","tok");
+        T("Bem-vindo de volta!","tok");
+        ev.participantes[uid].pix=SES.pix||ev.participantes[uid].pix;
+        ev.participantes[uid].nome=SES.name||ev.participantes[uid].nome;
       } else {
-        evGid=gid();
-        SES={uid:evGid,name:nome,phone:phone,pix:pix};
-        ev.participantes[evGid]={nome:nome,telefone:phone,pix:pix,role:"guest",pago:false,entrou:agora()};
+        ev.participantes[uid]={nome:SES.name,telefone:SES.phone||"",pix:SES.pix||"",role:"guest",pago:false,entrou:agora()};
       }
-      GSS={uid:evGid,nome:nome};GEV=ev.id;
-      _db.ref("eventos/"+ev.id+"/participantes/"+evGid).set(ev.participantes[evGid]);
-      _db.ref("usuarios/"+evGid).set(SES);
+      GSS={uid:uid,nome:SES.name};GEV=ev.id;
+      // salva participante e registra evento na conta do usuário (para restaurar no reload)
+      _db.ref("eventos/"+ev.id+"/participantes/"+uid).set(ev.participantes[uid]);
+      _db.ref("usuarios/"+uid+"/guestEventId").set(ev.id);
+      SES.guestEventId=ev.id;
       if(Q("codin"))Q("codin").value="";
-      if(Q("gcname"))Q("gcname").value="";
-      if(Q("gcphone"))Q("gcphone").value="";
-      if(Q("gcpix"))Q("gcpix").value="";
       fecharSheets();trackEvent("convidado_entrou");
       _ouvirEvento(ev.id,function(evAtual){
         window._evCache[evAtual.id]=evAtual;
         if(GSS&&GEV===evAtual.id)renderGuest(evAtual,GSS.uid);
       });
-      abrirGuest(ev.id,evGid);
+      abrirGuest(ev.id,uid);
     });
+  });
+}
+
+function openHostByCode(id){
+  _db.ref("eventos/"+id).once("value",function(snap){
+    if(snap.exists()){window._evCache[id]=snap.val();abrirHost(id);}
   });
 }
 
@@ -2062,7 +2099,15 @@ function sugerirItem(){
   });
 }
 
-function sairGuest(){_pararOuvirEvento();GSS=null;GEV=null;if(SES)goHome();else go("s-splash");}
+function sairGuest(){
+  _pararOuvirEvento();
+  if(SES&&SES.guestEventId){
+    _db.ref("usuarios/"+SES.uid+"/guestEventId").remove();
+    delete SES.guestEventId;
+  }
+  GSS=null;GEV=null;
+  if(SES)goHome();else go("s-splash");
+}
 function swTab(tab){["i","p","m","o"].forEach(function(t){var c=Q("tc"+t),b=Q("tb"+t);if(c)c.style.display=t===tab?"block":"none";if(b)b.classList.toggle("active",t===tab);});}
 function copiarCodigo(){
   var code=Q("evcode")?Q("evcode").textContent:"";if(!code||code==="--"){T("Nenhum codigo","ter");return;}
@@ -2892,7 +2937,7 @@ function processarComprovanteExtra(input,evid,evGid){
   input.value="";
 }
 
-window.goLogin=goLogin;window.doLogin=doLogin;window.go=go;window.goHome=goHome;
+window.loginGoogle=loginGoogle;window.goLogin=goLogin;window.doLogin=doLogin;window.go=go;window.goHome=goHome;
 window.logout=logout;window.savePerfil=savePerfil;window.selE=selE;
 window.novoEvento=novoEvento;window.abrirHost=abrirHost;window.swTab=swTab;
 window.updItem=updItem;window.editPreco=editPreco;window.abrirAddHost=abrirAddHost;
