@@ -2027,17 +2027,39 @@ function abrirSuggest(){initCat("g");abrirSheet("sh-suggest");}
 function sugerirItem(){
   var evGid=GSS?GSS.uid:null,evid=GEV||CID;
   if(!evGid){T("Sessao nao encontrada","ter");return;}
-  var ev=getEvento(evid);
+  if(!evid){T("Evento nao encontrado","ter");return;}
+
+  // pega nome e qtd dos campos manuais ou do carrinho
   var qtds=CS.g.qtds,sels=Object.keys(qtds).filter(function(k){return qtds[k]>0;});
-  if(sels.length>0){
-    sels.forEach(function(k){var p=CAT[k],qty=qtds[k],id2=gid();ev.itens[id2]={id:id2,nome:p.n+" "+p.b,qtd:qty+"x "+p.q,qtyNum:qty,qtyUnit:p.q,preco:(parseFloat(p.p)*qty).toFixed(2),por:GSS.nome,porId:evGid,status:"pendente",criadoEm:agora()};});
-    salvarEvento(ev);CS.g.qtds={};fecharSheets();T(sels.length+" sugestao(oes) enviada(s)!","tok");renderGuest(ev,evGid);return;
-  }
-  var nome=Q("siname")?Q("siname").value.trim():"";var qtd=Q("siqty")?Q("siqty").value.trim():"";
-  if(!nome){T("Selecione um produto ou adicione manualmente","ter");return;}
-  var id2=gid();ev.itens[id2]={id:id2,nome:nome,qtd:qtd,preco:"",por:GSS.nome,porId:evGid,status:"pendente",criadoEm:agora()};
-  salvarEvento(ev);if(Q("siname"))Q("siname").value="";if(Q("siqty"))Q("siqty").value="";
-  fecharSheets();T("Sugestao enviada!","tok");renderGuest(ev,evGid);
+  var nome=Q("siname")?Q("siname").value.trim():"";
+  var qtd=Q("siqty")?Q("siqty").value.trim():"";
+
+  if(sels.length===0&&!nome){T("Selecione um produto ou adicione manualmente","ter");return;}
+
+  // salva diretamente no Firebase sem depender do cache local
+  _whenReady(function(){
+    var itensRef=_db.ref("eventos/"+evid+"/itens");
+    if(sels.length>0){
+      var batch={};
+      sels.forEach(function(k){
+        var p=CAT[k],qty=qtds[k],id2=gid();
+        batch[id2]={id:id2,nome:p.n+" "+p.b,qtd:qty+"x "+p.q,qtyNum:qty,qtyUnit:p.q,
+          preco:(parseFloat(p.p)*qty).toFixed(2),por:GSS.nome,porId:evGid,status:"pendente",criadoEm:agora()};
+      });
+      itensRef.update(batch,function(err){
+        if(err){T("Erro ao enviar: "+err.message,"ter");return;}
+        CS.g.qtds={};fecharSheets();T(sels.length+" sugestao(oes) enviada(s)!","tok");
+      });
+    } else {
+      var id2=gid();
+      itensRef.child(id2).set({id:id2,nome:nome,qtd:qtd,preco:"",por:GSS.nome,porId:evGid,status:"pendente",criadoEm:agora()},function(err){
+        if(err){T("Erro ao enviar: "+err.message,"ter");return;}
+        if(Q("siname"))Q("siname").value="";
+        if(Q("siqty"))Q("siqty").value="";
+        fecharSheets();T("Sugestao enviada!","tok");
+      });
+    }
+  });
 }
 
 function sairGuest(){_pararOuvirEvento();GSS=null;GEV=null;if(SES)goHome();else go("s-splash");}
